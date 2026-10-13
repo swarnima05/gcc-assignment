@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GCC Launch Brief</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#faf8f4;--fg:#1d1d1f;--mut:#6b6b70;--card:#fff;--bd:#e4e0d8;--ac:#0f5c4d;--wr:#b45309}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181a;--fg:#ececec;--mut:#9a9aa0;--card:#202225;--bd:#33363a;--ac:#4fc3a8;--wr:#f0a35e}}
+:root[data-theme="dark"]{--bg:#17181a;--fg:#ececec;--mut:#9a9aa0;--card:#202225;--bd:#33363a;--ac:#4fc3a8;--wr:#f0a35e}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:880px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:17px;margin:0 0 12px}
+.sub{color:var(--mut);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+select,input[type=number]{width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{display:flex;align-items:center;gap:6px;margin:0;padding:6px 10px;border:1px solid var(--bd);border-radius:20px;color:var(--fg);font-size:14px;cursor:pointer}
+.w{display:flex;align-items:center;gap:10px;margin:8px 0}.w span{width:150px;font-size:14px}.w input{flex:1}
+button{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer;margin-top:12px}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--bd);font-size:14px;vertical-align:top}
+.bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;min-width:80px}.bar i{display:block;height:100%;background:var(--ac)}
+.warn{border-left:4px solid var(--wr);background:var(--card);padding:10px 14px;border-radius:8px;font-size:13px;color:var(--mut);margin-bottom:16px}
+.pill{font-size:12px;padding:2px 8px;border-radius:10px;background:var(--bd);color:var(--mut)}
+ul{margin:6px 0;padding-left:20px}
+</style></head><body><main>
+<h1>GCC Launch Brief</h1>
+<p class="sub">A decision workspace for a company evaluating its first or next Global Capability Centre in India.</p>
+<div class="warn"><b>Prototype notice:</b> city ratings below are illustrative placeholders (1-5) for demonstrating the scoring logic. They are not sourced data; verified facts with sources are shown separately in each brief. In a real version, each rating would link to a dated source and show its freshness.</div>
+
+<div class="card"><h2>1. Your situation</h2>
+<div class="row">
+<div><label for="fn">Primary function</label><select id="fn"><option>Software engineering</option><option>Data / AI</option><option>Finance &amp; operations</option><option>Cybersecurity</option></select></div>
+<div><label for="hc">Year-1 headcount</label><input id="hc" type="number" min="10" max="10000" value="100"></div>
+<div><label for="ph">Stage</label><select id="ph"><option>First GCC in India</option><option>Expanding an existing GCC</option></select></div>
+</div>
+<label>Candidate cities</label>
+<div class="chips" id="cities"></div></div>
+
+<div class="card"><h2>2. What matters most (weights)</h2><div id="weights"></div>
+<button id="go">Generate brief</button></div>
+
+<div id="out"></div>
+
+<script>
+var CRITERIA=[["talent","Talent availability"],["cost","Cost efficiency"],["cluster","Existing GCC ecosystem"],["incent","State incentives"],["infra","Office &amp; infrastructure"]];
+var CITIES={
+Bengaluru:{talent:5,cost:2,cluster:5,incent:3,infra:4},
+Hyderabad:{talent:4,cost:3,cluster:4,incent:4,infra:4},
+Pune:{talent:4,cost:3,cluster:3,incent:3,infra:3},
+Chennai:{talent:3,cost:4,cluster:3,incent:3,infra:3},
+"Delhi NCR":{talent:4,cost:2,cluster:4,incent:2,infra:4},
+Ahmedabad:{talent:2,cost:5,cluster:2,incent:4,infra:3}};
+var FACTS={Bengaluru:"487 GCCs, about 29% of India's total (Vestian report); JLL counts 900+ GCC units, a different measure.",Chennai:"162 GCCs, about 10% of India's total (Vestian report).",Hyderabad:"Described as the fastest-growing Tier-I GCC city, strong in semiconductor, pharma and product engineering (Zinnov)."};var WHY={talent:"Rated on depth of the relevant talent pool",cost:"Rated on relative office and salary cost (higher = cheaper)",cluster:"Rated on number of peer GCCs and service providers nearby",incent:"Rated on state policy support for GCCs",infra:"Rated on availability of ready office space"};
+var cd=document.getElementById("cities"),wd=document.getElementById("weights");
+Object.keys(CITIES).forEach(function(c,i){cd.insertAdjacentHTML("beforeend",'<label><input type="checkbox" value="'+c+'"'+(i<3?" checked":"")+'> '+c+'</label>')});
+CRITERIA.forEach(function(c){wd.insertAdjacentHTML("beforeend",'<div class="w"><span>'+c[1]+'</span><input type="range" id="w_'+c[0]+'" min="0" max="5" value="3"><b id="v_'+c[0]+'">3</b></div>');
+document.getElementById("w_"+c[0]).oninput=function(e){document.getElementById("v_"+c[0]).textContent=e.target.value}});
+document.getElementById("go").onclick=function(){
+var sel=[].slice.call(document.querySelectorAll("#cities input:checked")).map(function(x){return x.value});
+var out=document.getElementById("out");
+if(sel.length<2){out.innerHTML='<div class="card">Pick at least two cities to compare.</div>';return}
+var w={},b={},tot=0;CRITERIA.forEach(function(c){w[c[0]]=+document.getElementById("w_"+c[0]).value;b[c[0]]=w[c[0]]});var hcn=+document.getElementById("hc").value||0,adj=hcn>=1000?2:(hcn>=300?1:0);if(adj){w.talent+=adj;w.infra+=adj}CRITERIA.forEach(function(c){tot+=w[c[0]]});
+if(!tot){out.innerHTML='<div class="card">Give at least one criterion a weight above 0.</div>';return}
+var rows=sel.map(function(c){var s=0;CRITERIA.forEach(function(k){s+=CITIES[c][k[0]]*w[k[0]]});return{c:c,s:s/(tot*5)*100}}).sort(function(a,b){return b.s-a.s});
+var fn=document.getElementById("fn").value,hc=document.getElementById("hc").value,ph=document.getElementById("ph").value;
+var top=rows[0],gap=rows[0].s-rows[1].s;
+var h='<div class="card"><h2>3. Your brief</h2><p><b>'+top.c+'</b> ranks first for a '+ph.toLowerCase()+' ('+fn.toLowerCase()+', ~'+hc+' people in year 1) on your weights. ';
+h+=gap<5?'The lead over '+rows[1].c+' is small ('+gap.toFixed(1)+' pts), so treat these as a shortlist, not a decision.':'The lead over '+rows[1].c+' is '+gap.toFixed(1)+' pts.';
+h+='</p><div class="scroll"><table><tr><th>Rank</th><th>City</th><th>Fit score</th><th></th></tr>';
+rows.forEach(function(r,i){h+='<tr><td>'+(i+1)+'</td><td>'+r.c+'</td><td>'+r.s.toFixed(0)+'/100</td><td><div class="bar"><i style="width:'+r.s+'%"></i></div></td></tr>'});
+h+='</table></div></div>';
+h+='<div class="card"><h2>Why these scores (transparent method)</h2><div class="scroll"><table><tr><th>Criterion</th><th>Your weight</th><th>How it is rated</th><th>Source / freshness</th></tr>';
+CRITERIA.forEach(function(k){h+='<tr><td>'+k[1]+'</td><td>'+b[k[0]]+'/5'+(adj&&(k[0]=="talent"||k[0]=="infra")?' <span class="pill">+'+adj+' for headcount size</span>':'')+'</td><td>'+WHY[k[0]]+'</td><td><span class="pill">placeholder, not yet sourced</span></td></tr>'});
+h+='</table></div><p class="sub" style="margin-top:10px">Fit score = sum of (rating x weight) / maximum possible, shown out of 100. Headcount of 300-999 adds 1, and 1,000+ adds 2, to the talent and infrastructure weights (an assumption: larger teams need deeper talent pools and ready space). Anything above 1,000 scores the same, because the rule has only these steps. Function and stage currently change the wording of the brief only, not the scores.</p></div>';
+h+='<div class="card"><h2>Open questions to validate with an expert</h2><ul><li>Does the talent depth for '+fn.toLowerCase()+' in '+top.c+' hold at '+hc+' hires in year 1?</li><li>Which state incentive schemes currently apply, and what are the eligibility thresholds?</li><li>What do build-operate-transfer providers quote for this city and headcount?</li><li>Are there compliance or entity-setup steps specific to this state?</li></ul></div>';
+h+='<div class="card"><h2>Verified facts for your cities</h2><ul>';sel.forEach(function(c){h+='<li><b>'+c+':</b> '+(FACTS[c]||'No sourced data added yet.')+'</li>'});h+='</ul></div>';out.innerHTML=h;out.scrollIntoView({behavior:"smooth"})};
+</script></main></body></html>
